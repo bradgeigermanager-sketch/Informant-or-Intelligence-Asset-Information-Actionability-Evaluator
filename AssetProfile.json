@@ -1,0 +1,12 @@
+{
+  "AssetProfile": {
+    "asset_id": "string",
+    "historical_reliability": "integer", // 1 (Unreliable) to 5 (Highly Reliable)
+    "access_capability": "integer", // 1 (No direct access) to 5 (Direct primary access)
+    "desperation_flags": {
+      "financial_distress": "boolean",
+      "flight_risk_exfiltration_demanded": "boolean",
+      "chemical_dependency": "boolean",
+      "loss_of_status_or_access": "boolean"
+    }
+  }
