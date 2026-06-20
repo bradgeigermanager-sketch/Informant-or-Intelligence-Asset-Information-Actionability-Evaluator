@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asset Verification Dashboard</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; color: #333; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: auto; }
+        .panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .control { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="range"] { width: 100%; }
+        #score-display { font-size: 3em; font-weight: bold; text-align: center; margin: 20px 0; }
+        .directive { padding: 15px; text-align: center; font-weight: bold; border-radius: 5px; }
+        .ACTIONABLE { background: #d4edda; color: #155724; }
+        .QUARANTINE { background: #fff3cd; color: #856404; }
+        .FABRICATION { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="panel">
+        <h3>Input Metrics</h3>
+        <div class="control"><label>Historical Reliability (1-5)</label><input type="range" id="reliability" min="1" max="5" value="3"></div>
+        <div class="control"><label>Access Capability (1-5)</label><input type="range" id="access" min="1" max="5" value="3"></div>
+        <div class="control"><label>Independent Corroboration (1-5)</label><input type="range" id="corroboration" min="1" max="5" value="3"></div>
+        <div class="control"><label>Plausibility (1-5)</label><input type="range" id="plausibility" min="1" max="5" value="3"></div>
+        
+        <h3>Risk Factors</h3>
+        <input type="checkbox" id="financial"> Financial Distress<br>
+        <input type="checkbox" id="exfiltration"> Demanding Exfiltration/Asylum<br>
+        <input type="checkbox" id="addiction"> Addiction/Chemical Dependency<br>
+        <input type="checkbox" id="bias"> Aligns with Handler Bias<br>
+        <input type="checkbox" id="urgent"> Demanding Urgent Action<br>
+    </div>
+
+    <div class="panel">
+        <h3>Credibility Score</h3>
+        <div id="score-display">0</div>
+        <div id="directive" class="directive">AWAITING INPUT</div>
+    </div>
+</div>
+
+<script>
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(i => i.addEventListener('input', calculate));
+
+    function calculate() {
+        const rel = parseInt(document.getElementById('reliability').value);
+        const acc = parseInt(document.getElementById('access').value);
+        const corr = parseInt(document.getElementById('corroboration').value);
+        const plaus = parseInt(document.getElementById('plausibility').value);
+
+        const baseScore = (rel/5*30) + (acc/5*20) + (corr/5*30) + (plaus/5*20);
+        let multiplier = 1.0;
+
+        // Rules
+        if(document.getElementById('urgent').checked) {
+            let activeFlags = [
+                document.getElementById('financial').checked,
+                document.getElementById('exfiltration').checked,
+                document.getElementById('addiction').checked,
+                document.getElementById('urgent').checked
+            ].filter(Boolean).length;
+            multiplier -= (activeFlags * 0.15);
+        }
+        if(document.getElementById('exfiltration').checked && corr === 1) multiplier -= 0.40;
+        if(document.getElementById('bias').checked && (corr <= 2)) multiplier -= 0.25;
+
+        const finalScore = Math.max(0, baseScore * multiplier);
+        document.getElementById('score-display').innerText = Math.round(finalScore);
+
+        const dirEl = document.getElementById('directive');
+        if(finalScore >= 80) { dirEl.innerText = "ACTIONABLE"; dirEl.className = "directive ACTIONABLE"; }
+        else if(finalScore >= 50) { dirEl.innerText = "QUARANTINE - Mandate corroboration"; dirEl.className = "directive QUARANTINE"; }
+        else { dirEl.innerText = "FABRICATION RISK - CI Review Required"; dirEl.className = "directive FABRICATION"; }
+    }
+    calculate(); // Initial run
+</script>
+</body>
+</html>
