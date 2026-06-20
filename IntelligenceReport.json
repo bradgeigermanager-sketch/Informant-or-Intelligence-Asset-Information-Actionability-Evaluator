@@ -1,0 +1,10 @@
+{
+  "IntelligenceReport": {
+    "report_id": "string",
+    "asset_id": "string",
+    "corroboration_level": "integer", // 1 (None) to 5 (Verified by SIGINT/OSINT)
+    "plausibility": "integer", // 1 (Improbable) to 5 (Highly probable)
+    "aligns_with_handler_bias": "boolean", // Does this perfectly match what the agency wants to hear?
+    "urgency_demand": "boolean" // Is the asset demanding immediate action/payment?
+  }
+}
